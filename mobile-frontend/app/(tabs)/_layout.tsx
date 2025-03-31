@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
@@ -7,39 +7,57 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import LoginModal from "@/app/login/LoginModal";
+import { Screen } from "../login/Screen";
+import {isLogged} from "@/hooks/useUser";
+import RegisterModal from "@/app/login/RegisterModal";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
+  const [showLogin, setScreen] = useState<Screen | undefined>("REGISTER");
+
+    useEffect(() => {
+        if (isLogged()) {
+            setScreen(undefined)
+        }
+    }, []);
+
+
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+      <>
+          {showLogin === "LOGIN" && <LoginModal screenChangeRequest={screen => setScreen(screen)} />}
+          {showLogin === "REGISTER" && <RegisterModal screenChangeRequest={screen => setScreen(screen)} />}
+
+          <Tabs
+              screenOptions={{
+                  tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+                  headerShown: false,
+                  tabBarButton: HapticTab,
+                  tabBarBackground: TabBarBackground,
+                  tabBarStyle: Platform.select({
+                      ios: {
+                          // Use a transparent background on iOS to show the blur effect
+                          position: 'absolute',
+                      },
+                      default: {},
+                  }),
+              }}>
+              <Tabs.Screen
+                  name="index"
+                  options={{
+                      title: 'Início',
+                      tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+                  }}
+              />
+              <Tabs.Screen
+                  name="editUser"
+                  options={{
+                      title: 'Usuário',
+                      tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+                  }}
+              />
+          </Tabs>
+      </>
   );
 }

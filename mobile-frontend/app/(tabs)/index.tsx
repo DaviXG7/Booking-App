@@ -1,74 +1,80 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import {Image, StyleSheet, Platform, ScrollView} from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import CreateThings from "@/app/CreateThings";
 
 export default function HomeScreen() {
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
+        headerImage={<></>}
+        headerBackgroundColor={{
+          dark: '',
+          light: ''
+      }}
+        headerHeight={0}
+>
+        <CreateThings></CreateThings>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
+          <Image
+              source={require('@/assets/images/booking.png')}
+              style={styles.reactLogo}
+          />
+          <ThemedText type="title">Booking App</ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
+
+        <ThemedView>
+
+            <ThemedText type="subtitle">Agendamentos: </ThemedText>
+
+            <ThemedView style={styles.bookingContainer} lightColor={'#f7f7f7'} darkColor={'#222'}>
+                <ThemedView style={{alignItems: 'center', backgroundColor: "none"}}>
+                    <Image
+                        source={require('@/assets/images/medico.jpg')}
+                        style={styles.medicoLogo}
+                    />
+                </ThemedView>
+
+                <ThemedText>Data e hora: </ThemedText>
+                <ThemedText>Profissional: </ThemedText>
+                <ThemedText>Serviço: </ThemedText>
+            </ThemedView>
+
+        </ThemedView>
+
     </ParallaxScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+      alignItems: 'center',
+      gap: 15,
+      margin: 15,
+      textAlign: "center"
   },
   stepContainer: {
     gap: 8,
     marginBottom: 8,
   },
   reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    width: 100,
+      height: 100
   },
+    medicoLogo: {
+        width: 100,
+        height: 100,
+        borderRadius: 10,
+        borderStyle: 'solid',
+        borderWidth: 1,
+    },
+    bookingContainer: {
+        gap: 8,
+        marginBottom: 8,
+        padding: 8,
+        margin: 8,
+        borderRadius: 8,
+        boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+    }
 });
