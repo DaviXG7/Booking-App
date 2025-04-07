@@ -1,15 +1,12 @@
-import { StyleSheet, Image, Platform } from 'react-native';
+import {Image, TextInput} from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import {User} from "@/types/User";
 import {useCurrentUser} from "@/hooks/useUser";
 import React from 'react';
 import {HelloWave} from "@/components/HelloWave";
+import {ThemedText} from "@/components/ThemedText";
 
 const user: User | undefined = useCurrentUser()
 
@@ -40,6 +37,8 @@ export default function TabTwoScreen() {
         </ThemedText>
 
         <Collapsible title={"Editar informações"}>
+            <TextInput placeholder={"Edite seu nome"} />
+            <TextInput placeholder={"Envie uma imagem"} />
         </Collapsible>
 
     </ParallaxScrollView>

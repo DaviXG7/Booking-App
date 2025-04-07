@@ -15,7 +15,6 @@ export default function HomeScreen() {
       }}
         headerHeight={0}
 >
-        <CreateThings></CreateThings>
       <ThemedView style={styles.titleContainer}>
           <Image
               source={require('@/assets/images/booking.png')}
@@ -42,6 +41,9 @@ export default function HomeScreen() {
             </ThemedView>
 
         </ThemedView>
+
+        <CreateThings></CreateThings>
+
 
     </ParallaxScrollView>
   );
