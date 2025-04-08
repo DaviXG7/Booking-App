@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useColorScheme } from '@/hooks/other/useColorScheme';
 import LoginModal from "@/app/login/LoginModal";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
