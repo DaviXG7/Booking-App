@@ -5,7 +5,8 @@ let currentUser: User | undefined = {
     image: "",
     name: "Davi",
     email: "example",
-    role: "CUSTOMER"
+    role: "PROFESSIONAL",
+    agendamentos: []
 };
 
 

@@ -9,13 +9,15 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/other/useColorScheme';
 import LoginModal from "@/app/login/LoginModal";
 import { Screen } from "../login/Screen";
-import {isLogged} from "@/hooks/useUser";
+import {isLogged, useCurrentUser} from "@/hooks/useUser";
 import RegisterModal from "@/app/login/RegisterModal";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   const [showLogin, setScreen] = useState<Screen | undefined>("REGISTER");
+
+  const user = useCurrentUser();
 
     useEffect(() => {
         if (isLogged()) {

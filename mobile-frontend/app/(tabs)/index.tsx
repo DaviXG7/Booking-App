@@ -1,9 +1,13 @@
-import {Image, StyleSheet, Platform, ScrollView} from 'react-native';
+import {Image, StyleSheet, Platform, ScrollView, View, Pressable, FlatList} from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import CreateThings from "@/app/CreateThings";
+import {User} from "@/types/User";
+import {useCurrentUser} from "@/hooks/useUser";
+
+const user: User | undefined = useCurrentUser()
 
 export default function HomeScreen() {
   return (
@@ -25,20 +29,30 @@ export default function HomeScreen() {
 
         <ThemedView>
 
-            <ThemedText type="subtitle">Agendamentos: </ThemedText>
+            <ThemedText type="subtitle" style={{textAlign: "center"}}>Agendamentos: </ThemedText>
+            {user?.agendamentos.length == 0 && (
+                <ThemedText type={"defaultSemiBold"} style={{textAlign: "center"}}>Você não possui agendamentos</ThemedText>
+            )}
+            <FlatList
+                data={user?.agendamentos}
+                keyExtractor={(user) => user.id.toString()}
+                renderItem={({ item }) => (
+                    <ThemedView style={styles.bookingContainer} lightColor={'#f7f7f7'} darkColor={'#222'}>
+                        <ThemedView style={{alignItems: 'center', backgroundColor: "none"}}>
+                            <Image
+                                source={item?.agenda.service.professional.image ? { uri: item.agenda.service.professional.image } : require('@/assets/images/medico.jpg')}
+                                style={styles.medicoLogo}
+                            />
+                        </ThemedView>
 
-            <ThemedView style={styles.bookingContainer} lightColor={'#f7f7f7'} darkColor={'#222'}>
-                <ThemedView style={{alignItems: 'center', backgroundColor: "none"}}>
-                    <Image
-                        source={require('@/assets/images/medico.jpg')}
-                        style={styles.medicoLogo}
-                    />
-                </ThemedView>
-
-                <ThemedText>Data e hora: </ThemedText>
-                <ThemedText>Profissional: </ThemedText>
-                <ThemedText>Serviço: </ThemedText>
-            </ThemedView>
+                        <ThemedText>Data e hora: {item.date_time}</ThemedText>
+                        <ThemedText>Profissional: {item.agenda.service.professional.name}</ThemedText>
+                        <ThemedText>Serviço: {item.agenda.service.name}</ThemedText>
+                    </ThemedView>
+                )}
+                numColumns={2}
+                columnWrapperStyle={styles.row}
+            />
 
         </ThemedView>
 
@@ -56,6 +70,10 @@ const styles = StyleSheet.create({
       margin: 15,
       textAlign: "center"
   },
+    row: {
+        justifyContent: 'space-between',
+        paddingHorizontal: 8,
+    },
   stepContainer: {
     gap: 8,
     marginBottom: 8,
