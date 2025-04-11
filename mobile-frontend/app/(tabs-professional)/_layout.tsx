@@ -53,6 +53,13 @@ export default function TabLayout() {
                   }}
               />
               <Tabs.Screen
+                  name="YourAgendas"
+                  options={{
+                      title: 'Suas agendas',
+                      tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+                  }}
+              />
+              <Tabs.Screen
                   name="EditUser"
                   options={{
                       title: 'Usuário',

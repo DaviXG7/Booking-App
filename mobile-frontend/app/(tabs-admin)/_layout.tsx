@@ -53,6 +53,27 @@ export default function TabLayout() {
                   }}
               />
               <Tabs.Screen
+                  name="Users"
+                  options={{
+                      title: 'Usuários',
+                      tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+                  }}
+              />
+              <Tabs.Screen
+                  name="Agendas"
+                  options={{
+                      title: 'Agendas',
+                      tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+                  }}
+              />
+              <Tabs.Screen
+                  name="Bookings"
+                  options={{
+                      title: 'Agendamentos',
+                      tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+                  }}
+              />
+              <Tabs.Screen
                   name="EditUser"
                   options={{
                       title: 'Usuário',
