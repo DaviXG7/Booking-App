@@ -3,22 +3,26 @@ import {Image, StyleSheet, Platform, ScrollView, View, Pressable, FlatList} from
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import CreateThings from "@/app/CreateThings";
+import CreateThings from "@/app/defaults/CreateThings";
 import {User} from "@/types/User";
 import {useCurrentUser} from "@/hooks/useUser";
+import getAgendamentos, {getAgendamentosByUser} from "@/hooks/useAgendamentos";
 
 const user: User | undefined = useCurrentUser()
 
 export default function HomeScreen() {
+
+    const agendamentos = getAgendamentosByUser(user)
+
   return (
     <ParallaxScrollView
         headerImage={<></>}
         headerBackgroundColor={{
           dark: '',
           light: ''
-      }}
+        }}
         headerHeight={0}
->
+    >
       <ThemedView style={styles.titleContainer}>
           <Image
               source={require('@/assets/images/booking.png')}
@@ -27,14 +31,16 @@ export default function HomeScreen() {
           <ThemedText type="title">Booking App</ThemedText>
       </ThemedView>
 
-        <ThemedView>
+        <ThemedView style={{display: "flex", alignItems: "center"}}>
 
             <ThemedText type="subtitle" style={{textAlign: "center"}}>Agendamentos: </ThemedText>
-            {user?.agendamentos.length == 0 && (
+            <CreateThings></CreateThings>
+
+            {agendamentos.length == 0 && (
                 <ThemedText type={"defaultSemiBold"} style={{textAlign: "center"}}>Você não possui agendamentos</ThemedText>
             )}
             <FlatList
-                data={user?.agendamentos}
+                data={agendamentos}
                 keyExtractor={(user) => user.id.toString()}
                 renderItem={({ item }) => (
                     <ThemedView style={styles.bookingContainer} lightColor={'#f7f7f7'} darkColor={'#222'}>
@@ -55,8 +61,6 @@ export default function HomeScreen() {
             />
 
         </ThemedView>
-
-        <CreateThings></CreateThings>
 
 
     </ParallaxScrollView>

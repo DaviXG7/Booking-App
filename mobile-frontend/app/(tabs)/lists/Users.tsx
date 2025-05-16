@@ -72,7 +72,7 @@ export default function Users() {
 
                         <ThemedText>Cargo: {item.role}</ThemedText>
 
-                        <View style={{flexDirection: "row", gap: 10, justifyContent: "space-between", width: "100%"}}>
+                        <View style={styles.buttons}>
                             <Pressable style={[styles.button, {backgroundColor: "green"}]}><ThemedText>Editar</ThemedText></Pressable>
                             <Pressable style={[styles.button, {backgroundColor: "red"}]}><ThemedText>Excluir</ThemedText></Pressable>
                         </View>
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     },
     card: {
         flex: 1,
-        height: 350,
+        height: 400,
         padding: 10,
         margin: 6,
         justifyContent: "space-around",
@@ -137,5 +137,13 @@ const styles = StyleSheet.create({
     buttonText: {
         color: "#fff",
         fontWeight: "bold",
+    },
+    buttons: {
+        flexDirection: "row",
+        gap: 10,
+        justifyContent: "center",
+        width: "100%",
+        flexWrap: "wrap",
+        alignItems: "center"
     }
 });

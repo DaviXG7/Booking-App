@@ -1,6 +1,6 @@
 import {Booking} from "@/types/Bookings";
 
-type Role = "ADMIN" | "PROFESSIONAL" | "CUSTOMER"
+export type Role = "ADMIN" | "PROFESSIONAL" | "CUSTOMER"
 
 export type User = {
     id: number,
@@ -8,5 +8,4 @@ export type User = {
     name: string,
     email: string,
     role: Role,
-    agendamentos: Booking[]
 }

@@ -11,6 +11,7 @@ import LoginModal from "@/app/login/LoginModal";
 import { Screen } from "../login/Screen";
 import {isLogged, useCurrentUser} from "@/hooks/useUser";
 import RegisterModal from "@/app/login/RegisterModal";
+import DefaultTabs from "@/app/defaults/DefaultTabs";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -37,13 +38,7 @@ export default function TabLayout() {
                   headerShown: false,
                   tabBarButton: HapticTab,
                   tabBarBackground: TabBarBackground,
-                  tabBarStyle: Platform.select({
-                      ios: {
-                          // Use a transparent background on iOS to show the blur effect
-                          position: 'absolute',
-                      },
-                      default: {},
-                  }),
+                  tabBarStyle: {display: "none"}
               }}>
               <Tabs.Screen
                   name="index"
@@ -60,6 +55,10 @@ export default function TabLayout() {
                   }}
               />
           </Tabs>
+          <DefaultTabs>
+
+          </DefaultTabs>
       </>
   );
 }
+

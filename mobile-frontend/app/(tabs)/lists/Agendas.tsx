@@ -3,31 +3,69 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import {FlatList, Image, Pressable, StyleSheet, TextInput, View} from "react-native";
 import {ThemedView} from "@/components/ThemedView";
 import {useEffect, useState} from "react";
-import getAgendamentos from "@/hooks/useAgendamentos";
-import {Booking} from "@/types/Bookings";
+import getAgendas from "@/hooks/useAgendas";
+import {Agenda} from "@/types/Agendas";
 
+
+enum DayOfWeek {
+    Sunday = 0,
+    Monday = 1,
+    Tuesday = 2,
+    Wednesday = 3,
+    Thursday = 4,
+    Friday = 5,
+    Saturday = 6
+}
+
+function getIndexOfDayOfWeek(day: string): number {
+    const daysOfWeek: { [key: string]: DayOfWeek } = {
+        "domingo": DayOfWeek.Sunday,
+        "segunda": DayOfWeek.Monday,
+        "terça": DayOfWeek.Tuesday,
+        "quarta": DayOfWeek.Wednesday,
+        "quinta": DayOfWeek.Thursday,
+        "sexta": DayOfWeek.Friday,
+        "sábado": DayOfWeek.Saturday
+    };
+
+    return daysOfWeek[day.toLowerCase()];
+}
+
+function getDayOfWeek(index: number): string {
+    const daysOfWeek: { [key: number]: string } = {
+        0: "Domingo",
+        1: "Segunda",
+        2: "Terça",
+        3: "Quarta",
+        4: "Quinta",
+        5: "Sexta",
+        6: "Sábado"
+    };
+
+    return daysOfWeek[index];
+}
 
 function handleSearch(datetime: string){
 
-    const bookings = getAgendamentos();
+    const agendas = getAgendas();
 
     if (datetime == "") {
-        return bookings
+        return agendas
     }
 
-    return bookings.filter(booking => {
-        return booking.date_time.toLowerCase().includes(datetime.toLowerCase());
+    return agendas.filter(agenda => {
+        return agenda.week_day === getIndexOfDayOfWeek(datetime.toLowerCase());
     })
 }
 
-export default function Bookings() {
+export default function Agendas() {
 
     const [search, setSearch] = useState("");
 
-    const [bookings, setBookings] = useState<Array<Booking>>();
+    const [agendas, setAgendas] = useState<Array<Agenda>>();
 
     useEffect(() => {
-        setBookings(handleSearch(""))
+        setAgendas(handleSearch(""))
     }, [])
 
     return <ParallaxScrollView
@@ -37,7 +75,7 @@ export default function Bookings() {
     }} headerHeight={0}>
         <View>
             <ThemedView>
-                <ThemedText type={"title"} style={{margin: 10}}>Agendamentos</ThemedText>
+                <ThemedText type={"title"} style={{margin: 10}}>Agendas</ThemedText>
             </ThemedView>
             <ThemedView
                 style={styles.container}
@@ -50,13 +88,13 @@ export default function Bookings() {
                     value={search}
                     onChangeText={(text => {
                         setSearch(text)
-                        setBookings(handleSearch(search))
+                        setAgendas(handleSearch(search))
                     })}
                     placeholderTextColor={"#999"}
                 />
             </ThemedView>
             <FlatList
-                data={bookings}
+                data={agendas}
                 keyExtractor={(user) => user.id.toString()}
                 renderItem={({ item }) => (
                     <ThemedView style={styles.card}
@@ -64,13 +102,12 @@ export default function Bookings() {
                                 darkColor={"#222"}
                     >
                         <Image
-                            source={item?.agenda.service.professional.image ? { uri: item.agenda.service.professional.image } : require('@/assets/images/medico.jpg')}
+                            source={item?.professional.image ? { uri: item.professional.image } : require('@/assets/images/medico.jpg')}
                             style={styles.image}
                         />
-                        <ThemedText numberOfLines={2} ellipsizeMode="tail">Dia: {item.date_time}</ThemedText>
-                        <ThemedText numberOfLines={2} ellipsizeMode="tail">Profissional: {item.agenda.service.professional.name}</ThemedText>
-                        <ThemedText numberOfLines={3} ellipsizeMode="tail">Requisitado por: {item.customer.name}</ThemedText>
-                        <ThemedText numberOfLines={3} ellipsizeMode="tail">Serviço: {item.agenda.service.name}</ThemedText>
+                        <ThemedText numberOfLines={2} ellipsizeMode="tail">Dia da semana: {getDayOfWeek(item.week_day)}</ThemedText>
+                        <ThemedText numberOfLines={2} ellipsizeMode="tail">Profissional: {item.professional.name}</ThemedText>
+                        <ThemedText numberOfLines={3} ellipsizeMode="tail">Serviço: {item.service.name}</ThemedText>
 
                         <View style={{flexDirection: "row", gap: 10, justifyContent: "space-between", width: "100%"}}>
                             <Pressable style={[styles.button, {backgroundColor: "green"}]}><ThemedText>Editar</ThemedText></Pressable>
@@ -91,6 +128,8 @@ const styles = StyleSheet.create({
     row: {
         justifyContent: 'space-between',
         paddingHorizontal: 8,
+        flexDirection: "column"
+
     },
     card: {
         flex: 1,
