@@ -5,13 +5,13 @@ import {ThemedText} from "@/components/ThemedText";
 import {ThemedView} from "@/components/ThemedView";
 import {useEffect, useState} from "react";
 import {User} from "@/types/User";
+import {Professional} from "@/types/Professional";
 
 
-function handleSearch(name: string){
-
-    const users = getUsers();
+function handleSearch(users: Array<User | Professional>, name: string){
 
     if (name == "") {
+        console.log(users)
         return users
     }
 
@@ -24,11 +24,21 @@ export default function Users() {
 
     const [search, setSearch] = useState("");
 
+    const [dbUsers, setDBUsers] = useState<Array<User | Professional>>([]);
+
+    useEffect(() => {
+        getUsers().then((users) => {
+            console.log(users)
+            return setDBUsers(users);
+        })
+    }, []);
+
     const [users, setUsers] = useState<Array<User>>();
 
     useEffect(() => {
-        setUsers(handleSearch(""))
-    }, [])
+        setUsers(handleSearch(dbUsers, search))
+    }, [dbUsers, search])
+
 
     return <ParallaxScrollView
         headerImage={<></>} headerBackgroundColor={{
@@ -48,10 +58,10 @@ export default function Users() {
                     style={styles.input}
                     placeholder="Buscar..."
                     value={search}
-                    onChangeText={(text => {
-                        setSearch(text)
-                        setUsers(handleSearch(search))
-                    })}
+                    onChangeText={(text) => {
+                        setSearch(text);
+                        setUsers(handleSearch(dbUsers, text));
+                    }}
                     placeholderTextColor={"#999"}
                 />
             </ThemedView>
@@ -59,9 +69,10 @@ export default function Users() {
                 data={users}
                 keyExtractor={(user) => user.id.toString()}
                 renderItem={({ item }) => (
-                    <ThemedView style={styles.card}
-                                lightColor={"#eee"}
-                                darkColor={"#222"}
+                    <ThemedView
+                        style={styles.card}
+                        lightColor={"#eee"}
+                        darkColor={"#222"}
                     >
                         <Image
                             source={item?.image ? { uri: item.image } : require('@/assets/images/medico.jpg')}
@@ -69,17 +80,18 @@ export default function Users() {
                         />
                         <ThemedText numberOfLines={2} ellipsizeMode="tail">Nome: {item.name}</ThemedText>
                         <ThemedText numberOfLines={3} ellipsizeMode="tail">Email: {item.email}</ThemedText>
-
                         <ThemedText>Cargo: {item.role}</ThemedText>
 
                         <View style={styles.buttons}>
-                            <Pressable style={[styles.button, {backgroundColor: "green"}]}><ThemedText>Editar</ThemedText></Pressable>
-                            <Pressable style={[styles.button, {backgroundColor: "red"}]}><ThemedText>Excluir</ThemedText></Pressable>
+                            <Pressable style={[styles.button, { backgroundColor: "green" }]}>
+                                <ThemedText>Editar</ThemedText>
+                            </Pressable>
+                            <Pressable style={[styles.button, { backgroundColor: "red" }]}>
+                                <ThemedText>Excluir</ThemedText>
+                            </Pressable>
                         </View>
                     </ThemedView>
                 )}
-                numColumns={2}
-                columnWrapperStyle={styles.row}
             />
 
 

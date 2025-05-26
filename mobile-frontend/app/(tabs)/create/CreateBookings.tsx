@@ -1,40 +1,35 @@
 import {ThemedView} from "@/components/ThemedView";
 import {ThemedText} from "@/components/ThemedText";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Dropdown} from "react-native-element-dropdown";
 import {Pressable, StyleSheet, TextInput} from "react-native";
-import {getCustomers} from "@/hooks/useUsers";
+import {getCustomers, getProfessionals} from "@/hooks/useUsers";
 import {RequestForm} from "@/types/Form";
 import {makeRequest} from "@/hooks/useRequest";
 import NotificationBox, {NotificationMessage} from "@/app/defaults/NotificationBox";
-
-const days = [
-
-    {label: "Domingo", value: 0},
-    {label: "Segunda", value: 1},
-    {label: "Terça", value: 2},
-    {label: "Quarta", value: 3},
-    {label: "Quinta", value: 4},
-    {label: "Sexta", value: 5},
-    {label: "Sábado", value: 6}
-]
+import {getServices} from "@/hooks/useServices";
+import {getWeekDayValues} from "@/types/Days";
+import {Agenda} from "@/types/Agendas";
+import {Service} from "@/types/Service";
 
 export default function() {
 
-    const users = getCustomers();
+    const services = getServices();
+
+    const [service, setService] = useState<Service | null>(null)
 
     const [message, setMessage] = useState<NotificationMessage | null>(null)
+
+    const [price, setPrice] = useState<number>(0)
+    const [agendas, setAgendas] = useState<Array<Agenda>>([])
 
     const [formData, setFormData] = useState<RequestForm>({
         url: "",
         method: "POST",
         params: [
-            {key: "id_user", value: null, isRequired: true},
-            {key: "role", value: null, isRequired: true},
-            {key: "pix", value: null, isRequired: false},
-            {key: "bank_name", value: null, isRequired: false},
-            {key: "account_number", value: null, isRequired: false},
-            {key: "agency", value: null, isRequired: false},
+            {key: "id_agenda", value: null, isRequired: true},
+            {key: "id_customer", value: "a", isRequired: true},
+            {key: "date_time", value: null, isRequired: true},
         ]
     });
 
@@ -74,54 +69,43 @@ export default function() {
     return (
         <ThemedView style={styles.screen}>
             <ThemedView style={styles.form} lightColor="#fff" darkColor="#000">
-                <ThemedText type={"title"} style={{margin: 5, textAlign: "center"}}>Registrar profissional</ThemedText>
+                <ThemedText type={"title"} style={{margin: 5, textAlign: "center"}}>Fazer uma reserva:</ThemedText>
 
                 <Dropdown
                     style={styles.input}
-                    data={users}
+                    data={services}
                     maxHeight={300}
                     placeholderStyle={{padding: 20}}
                     labelField="name"
                     valueField="id"
-                    placeholder={"Selecione o usuário*"}
-                    value={formData.params.find(p => p.key === "id_user")?.value}
-                    onChange={item => handleChange("id_user", item.id)}
+                    placeholder={"Selecione o serviço.. *"}
+                    value={service}
+                    onChange={item => setService(services.filter(s => s.id === item.id)[0])}
                 />
-
                 <TextInput
                     style={styles.input}
-                    placeholder="Digite o Cargo do profissional*"
-                    onChangeText={(i) => handleChange("role", i)}
-                />
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="Digite a chave PIX"
-                    onChangeText={(i) => handleChange("pix", i)}
-                />
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="Digite o nome do banco"
-                    onChangeText={(i) => handleChange("bank_name", i)}
-                />
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="Número da conta"
+                    placeholder="Dia e hora"
                     keyboardType="numeric"
-                    onChangeText={(i) => handleChange("account_number", i)}
+                    onChangeText={(i) => handleChange("date_time", i)}
                 />
+                {service !== null && formData.params.find(p => p.key = "date_time") !== null && (
+                    <Dropdown
+                        style={styles.input}
+                        data={agendas}
+                        maxHeight={300}
+                        placeholderStyle={{padding: 20}}
+                        labelField="name"
+                        valueField="id"
+                        placeholder={"Selecione a agenda.. *"}
+                        value={service}
+                        onChange={item => handleChange("id_agenda", item.id)}
+                    />
+                )}
 
-                <TextInput
-                    style={styles.input}
-                    placeholder="Agência"
-                    keyboardType="numeric"
-                    onChangeText={(i) => handleChange("agency", i)}
-                />
+                <ThemedText style={{fontSize: 14}} lightColor="#FFF" darkColor="#000">Preço: R${price}</ThemedText>
 
                 <Pressable style={styles.button} onPress={handleSubmit}>
-                    <ThemedText lightColor="#FFF" darkColor="#000">Enviar</ThemedText>
+                    <ThemedText lightColor="#FFF" darkColor="#000">Pagar</ThemedText>
                 </Pressable>
                 <ThemedText style={{fontSize: 14}}>* Obrigatório</ThemedText>
             </ThemedView>

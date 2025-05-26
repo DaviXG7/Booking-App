@@ -16,7 +16,7 @@ import DefaultTabs from "@/app/defaults/DefaultTabs";
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
-  const [showLogin, setScreen] = useState<Screen | undefined>("REGISTER");
+  const [showLogin, setScreen] = useState<Screen | undefined>("LOGIN");
 
   const user = useCurrentUser();
 

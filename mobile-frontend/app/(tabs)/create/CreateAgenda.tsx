@@ -3,25 +3,18 @@ import {ThemedText} from "@/components/ThemedText";
 import React, {useState} from "react";
 import {Dropdown} from "react-native-element-dropdown";
 import {Pressable, StyleSheet, TextInput} from "react-native";
-import {getCustomers} from "@/hooks/useUsers";
+import {getCustomers, getProfessionals} from "@/hooks/useUsers";
 import {RequestForm} from "@/types/Form";
 import {makeRequest} from "@/hooks/useRequest";
 import NotificationBox, {NotificationMessage} from "@/app/defaults/NotificationBox";
-
-const days = [
-
-    {label: "Domingo", value: 0},
-    {label: "Segunda", value: 1},
-    {label: "Terça", value: 2},
-    {label: "Quarta", value: 3},
-    {label: "Quinta", value: 4},
-    {label: "Sexta", value: 5},
-    {label: "Sábado", value: 6}
-]
+import {getServices} from "@/hooks/useServices";
+import {getWeekDayValues} from "@/types/Days";
 
 export default function() {
 
-    const users = getCustomers();
+    const professionals = getProfessionals();
+    const services = getServices();
+    const days = getWeekDayValues();
 
     const [message, setMessage] = useState<NotificationMessage | null>(null)
 
@@ -29,12 +22,10 @@ export default function() {
         url: "",
         method: "POST",
         params: [
-            {key: "id_user", value: null, isRequired: true},
-            {key: "role", value: null, isRequired: true},
-            {key: "pix", value: null, isRequired: false},
-            {key: "bank_name", value: null, isRequired: false},
-            {key: "account_number", value: null, isRequired: false},
-            {key: "agency", value: null, isRequired: false},
+            {key: "id_professional", value: null, isRequired: true},
+            {key: "id_service", value: null, isRequired: true},
+            {key: "week_day", value: null, isRequired: true},
+            {key: "start_time", value: null, isRequired: true},
         ]
     });
 
@@ -74,50 +65,49 @@ export default function() {
     return (
         <ThemedView style={styles.screen}>
             <ThemedView style={styles.form} lightColor="#fff" darkColor="#000">
-                <ThemedText type={"title"} style={{margin: 5, textAlign: "center"}}>Registrar profissional</ThemedText>
+                <ThemedText type={"title"} style={{margin: 5, textAlign: "center"}}>Cadastrar agenda</ThemedText>
 
                 <Dropdown
                     style={styles.input}
-                    data={users}
+                    data={professionals}
                     maxHeight={300}
                     placeholderStyle={{padding: 20}}
                     labelField="name"
                     valueField="id"
-                    placeholder={"Selecione o usuário*"}
-                    value={formData.params.find(p => p.key === "id_user")?.value}
-                    onChange={item => handleChange("id_user", item.id)}
+                    placeholder={"Selecione o prof.. *"}
+                    value={formData.params.find(p => p.key === "id_professional")?.value}
+                    onChange={item => handleChange("id_professional", item.id)}
+                />
+
+                <Dropdown
+                    style={styles.input}
+                    data={services}
+                    maxHeight={300}
+                    placeholderStyle={{padding: 20}}
+                    labelField="name"
+                    valueField="id"
+                    placeholder={"Selecione o serviço*"}
+                    value={formData.params.find(p => p.key === "id_service")?.value}
+                    onChange={item => handleChange("id_service", item.id)}
+                />
+
+                <Dropdown
+                    style={styles.input}
+                    data={days}
+                    maxHeight={300}
+                    placeholderStyle={{padding: 20}}
+                    labelField="name"
+                    valueField="id"
+                    placeholder={"Selecione o dia*"}
+                    value={formData.params.find(p => p.key === "week_day")?.value}
+                    onChange={item => handleChange("week_day", item.id)}
                 />
 
                 <TextInput
                     style={styles.input}
-                    placeholder="Digite o Cargo do profissional*"
-                    onChangeText={(i) => handleChange("role", i)}
-                />
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="Digite a chave PIX"
-                    onChangeText={(i) => handleChange("pix", i)}
-                />
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="Digite o nome do banco"
-                    onChangeText={(i) => handleChange("bank_name", i)}
-                />
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="Número da conta"
+                    placeholder="Hora"
                     keyboardType="numeric"
-                    onChangeText={(i) => handleChange("account_number", i)}
-                />
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="Agência"
-                    keyboardType="numeric"
-                    onChangeText={(i) => handleChange("agency", i)}
+                    onChangeText={(i) => handleChange("start_time", i)}
                 />
 
                 <Pressable style={styles.button} onPress={handleSubmit}>

@@ -1,12 +1,7 @@
 import {User} from "@/types/User";
+import {RequestForm} from "@/types/Form";
 
-let currentUser: User | undefined = {
-    id: 1,
-    image: "",
-    name: "Davi",
-    email: "example",
-    role: "ADMIN"
-};
+let currentUser: User | undefined = undefined;
 
 
 export function isLogged() {
@@ -17,6 +12,6 @@ export function useCurrentUser() {
     return currentUser;
 }
 
-export function login() {
-
+export function login(user: User) {
+    currentUser = user;
 }

@@ -1,11 +1,66 @@
 import {Image, Modal, Pressable, StyleSheet, TextInput} from "react-native";
 import {ThemedText} from "@/components/ThemedText";
 import {ThemedView} from "@/components/ThemedView";
-import {ExternalLink} from "@/components/ExternalLink";
 import {Screen} from "@/app/login/Screen";
+import {useState} from "react";
+import {RequestForm} from "@/types/Form";
+import NotificationBox, {NotificationMessage} from "@/app/defaults/NotificationBox";
+import {makeRequest} from "@/hooks/useRequest";
+import {isLogged, login} from "@/hooks/useUser";
+import {User} from "@/types/User";
 
 
-export default function LoginModal({screenChangeRequest: setScreen}: {screenChangeRequest: ((screen: Screen) => void)}) {
+export default function LoginModal({screenChangeRequest: setScreen}: {screenChangeRequest: ((screen: Screen | undefined) => void)}) {
+    const [formData, setFormData] = useState<RequestForm>({
+        url: "http://127.0.0.1:8000/login",
+        method: "POST",
+        params: [
+            {key: "email", value: null, isRequired: true},
+            {key: "password", value: null, isRequired: true}
+        ]
+    });
+
+    const [message, setMessage] = useState<NotificationMessage | null>(null)
+
+
+    const handleChange = (key: string, value: any) => {
+        setFormData(prev => ({
+            ...prev,
+            params: prev.params.map(param =>
+                param.key === key ? { ...param, value } : param
+            )
+        }));
+    };
+
+    const handleSubmit = () => {
+        makeRequest(formData).then(async r => {
+            console.log(r)
+            if (r.status === 200) {
+                setMessage({
+                    message: "Usuário logado com sucesso!",
+                    type: "success"
+                });
+                r.json().then(user => {
+                    console.log(user)
+                    login(user as User)
+                    if (isLogged()) setScreen(undefined)
+                })
+            }
+            const data = await r.json();
+            console.log(data)
+            setMessage({
+                message: "Erro ao login usuário: " + data.message,
+                type: "error"
+            });
+
+        }).catch((e) => {
+            console.log(e);
+            setMessage({
+                message: "Preencha todos os campos obrigatórios",
+                type: "warning"
+            });
+        });
+    };
 
     return (
         <Modal
@@ -21,20 +76,26 @@ export default function LoginModal({screenChangeRequest: setScreen}: {screenChan
                     style={styles.logo}
                 />
 
-                <ThemedText type={"subtitle"}>Logar no Bokking app</ThemedText>
+                <ThemedText type={"subtitle"}>Logar no Booking app</ThemedText>
 
                 <ThemedView style={styles.modalView} lightColor={'#f7f7f7'} darkColor={'#222'}>
-                    <TextInput style={styles.input} placeholder={"Digite seu email"} />
-                    <TextInput style={styles.input}  placeholder={"Digite sua senha"} />
-                    <Pressable style={styles.button} onPress={() => {}} >
+                    <TextInput style={styles.input} placeholder={"Digite seu email"} onChangeText={(text) => handleChange("email", text)} />
+                    <TextInput style={styles.input}  placeholder={"Digite sua senha"} onChangeText={(text) => handleChange("password", text)} />
+                    <Pressable style={styles.button} onPress={handleSubmit} >
                         <ThemedText>Entrar</ThemedText>
                     </Pressable>
-                    <Pressable style={{margin: 2 }} onPress={() => {setScreen("REGISTER")}} >
-                        Não tem uma conta? Registrar
+                    <Pressable style={{ margin: 2 }} onPress={() => {setScreen("REGISTER")}} >
+                        <ThemedText>Não tem uma conta? Cadastrar</ThemedText>
                     </Pressable>
                 </ThemedView>
 
             </ThemedView>
+            <NotificationBox
+                message={message?.message ?? ""}
+                type={message?.type ?? "success"}
+                visible={message != null}
+                onClose={() => setMessage(null)}
+            />
         </Modal>
     )
 }

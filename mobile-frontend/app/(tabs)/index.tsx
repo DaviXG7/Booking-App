@@ -46,13 +46,13 @@ export default function HomeScreen() {
                     <ThemedView style={styles.bookingContainer} lightColor={'#f7f7f7'} darkColor={'#222'}>
                         <ThemedView style={{alignItems: 'center', backgroundColor: "none"}}>
                             <Image
-                                source={item?.agenda.service.professional.image ? { uri: item.agenda.service.professional.image } : require('@/assets/images/medico.jpg')}
+                                source={item?.agenda.professional.image ? { uri: item.agenda.professional.image } : require('@/assets/images/medico.jpg')}
                                 style={styles.medicoLogo}
                             />
                         </ThemedView>
 
                         <ThemedText>Data e hora: {item.date_time}</ThemedText>
-                        <ThemedText>Profissional: {item.agenda.service.professional.name}</ThemedText>
+                        <ThemedText>Profissional: {item.agenda.professional.name}</ThemedText>
                         <ThemedText>Serviço: {item.agenda.service.name}</ThemedText>
                     </ThemedView>
                 )}
