@@ -8,12 +8,13 @@ import {makeRequest} from "@/hooks/useRequest";
 import NotificationBox, {NotificationMessage} from "@/app/defaults/NotificationBox";
 import {isLogged, login} from "@/hooks/useUser";
 import {User} from "@/types/User";
+import {Professional} from "@/types/Professional";
 
 
 export default function RegisterModal({screenChangeRequest: setScreen}: {screenChangeRequest: ((screen: Screen | undefined) => void)}) {
 
     const [formData, setFormData] = useState<RequestForm>({
-        url: "http://127.0.0.1:8000/register",
+        url: "http://127.0.0.1:8000/user/register",
         method: "POST",
         params: [
             {key: "name", value: null, isRequired: true},
@@ -44,9 +45,10 @@ export default function RegisterModal({screenChangeRequest: setScreen}: {screenC
                 });
                 r.json().then(user => {
                     console.log(user)
-                    login(user as User)
+                    login(user)
                     if (isLogged()) setScreen(undefined)
                 })
+                return;
             }
             const data = await r.json();
             setMessage({
@@ -82,9 +84,9 @@ export default function RegisterModal({screenChangeRequest: setScreen}: {screenC
                 <ThemedView style={styles.modalView} lightColor={'#f7f7f7'} darkColor={'#222'}>
                     <TextInput style={styles.input} placeholder={"Digite seu nome"} onChangeText={(text) => handleChange("name", text)} />
                     <TextInput style={styles.input} placeholder={"Digite seu email"} onChangeText={(text) => handleChange("email", text)} />
-                    <TextInput style={styles.input}  placeholder={"Digite sua senha"} onChangeText={(text) => handleChange("password", text)} />
+                    <TextInput secureTextEntry={true} style={styles.input}  placeholder={"Digite sua senha"} onChangeText={(text) => handleChange("password", text)} />
                     <Pressable style={styles.button} onPress={handleSubmit} >
-                        <ThemedText>Entrar</ThemedText>
+                        <ThemedText>Cadastrar</ThemedText>
                     </Pressable>
                     <Pressable style={{ margin: 2 }} onPress={() => {setScreen("LOGIN")}} >
                         <ThemedText>Já tem uma conta? Logar</ThemedText>

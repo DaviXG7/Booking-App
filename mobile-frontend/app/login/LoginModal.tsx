@@ -8,11 +8,15 @@ import NotificationBox, {NotificationMessage} from "@/app/defaults/NotificationB
 import {makeRequest} from "@/hooks/useRequest";
 import {isLogged, login} from "@/hooks/useUser";
 import {User} from "@/types/User";
-
+import {useNavigation} from "expo-router";
+import {Professional} from "@/types/Professional";
 
 export default function LoginModal({screenChangeRequest: setScreen}: {screenChangeRequest: ((screen: Screen | undefined) => void)}) {
+
+    const navigation = useNavigation();
+
     const [formData, setFormData] = useState<RequestForm>({
-        url: "http://127.0.0.1:8000/login",
+        url: "http://127.0.0.1:8000/user/login",
         method: "POST",
         params: [
             {key: "email", value: null, isRequired: true},
@@ -42,9 +46,10 @@ export default function LoginModal({screenChangeRequest: setScreen}: {screenChan
                 });
                 r.json().then(user => {
                     console.log(user)
-                    login(user as User)
+                    login(user)
                     if (isLogged()) setScreen(undefined)
                 })
+                return;
             }
             const data = await r.json();
             console.log(data)
@@ -80,7 +85,7 @@ export default function LoginModal({screenChangeRequest: setScreen}: {screenChan
 
                 <ThemedView style={styles.modalView} lightColor={'#f7f7f7'} darkColor={'#222'}>
                     <TextInput style={styles.input} placeholder={"Digite seu email"} onChangeText={(text) => handleChange("email", text)} />
-                    <TextInput style={styles.input}  placeholder={"Digite sua senha"} onChangeText={(text) => handleChange("password", text)} />
+                    <TextInput secureTextEntry={true} style={styles.input}  placeholder={"Digite sua senha"} onChangeText={(text) => handleChange("password", text)} />
                     <Pressable style={styles.button} onPress={handleSubmit} >
                         <ThemedText>Entrar</ThemedText>
                     </Pressable>

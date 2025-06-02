@@ -1,29 +1,39 @@
 import {ThemedView} from "@/components/ThemedView";
 import {ThemedText} from "@/components/ThemedText";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Dropdown} from "react-native-element-dropdown";
 import {Pressable, StyleSheet, TextInput} from "react-native";
-import {getCustomers} from "@/hooks/useUsers";
+import {getCustomers, getUsers} from "@/hooks/useUsers";
 import {RequestForm} from "@/types/Form";
 import {makeRequest} from "@/hooks/useRequest";
 import NotificationBox, {NotificationMessage} from "@/app/defaults/NotificationBox";
+import {User} from "@/types/User";
+import {Professional} from "@/types/Professional";
 
 export default function() {
 
-    const users = getCustomers();
+    const [users, setUsers] = useState<Array<User>>([]);
+
+    useEffect(() => {
+        getCustomers().then((users) => {
+            console.log(users)
+            return setUsers(users);
+        })
+    }, []);
 
     const [message, setMessage] = useState<NotificationMessage | null>(null)
 
     const [formData, setFormData] = useState<RequestForm>({
-        url: "",
+        url: "http://127.0.0.1:8000/professional/register/",
         method: "POST",
         params: [
             {key: "id_user", value: null, isRequired: true},
             {key: "role", value: null, isRequired: true},
-            {key: "pix", value: null, isRequired: false},
-            {key: "bank_name", value: null, isRequired: false},
-            {key: "account_number", value: null, isRequired: false},
-            {key: "agency", value: null, isRequired: false},
+            {key: "phone_number", value: null, isRequired: true},
+            {key: "pix", value: null, isRequired: true},
+            {key: "bank_name", value: null, isRequired: true},
+            {key: "account_number", value: null, isRequired: true},
+            {key: "agency", value: null, isRequired: true},
         ]
     });
 
@@ -38,7 +48,7 @@ export default function() {
 
     const handleSubmit = () => {
         console.log(formData);
-        makeRequest(formData).then(r => {
+        makeRequest(formData).then(async r => {
             if (r.status === 200) {
                 setMessage({
                     message: "Profissional registrado com sucesso!",
@@ -46,8 +56,11 @@ export default function() {
                 });
                 return
             }
+
+            const data = await r.json();
+
             setMessage({
-                message: "Erro ao registrar profissional",
+                message: "Erro ao registrar profissional " + data.message,
                 type: "error"
             });
 
@@ -81,6 +94,13 @@ export default function() {
                     style={styles.input}
                     placeholder="Digite o Cargo do profissional*"
                     onChangeText={(i) => handleChange("role", i)}
+                />
+
+                <TextInput
+                    style={styles.input}
+                    keyboardType="numeric"
+                    placeholder="Digite o número de telefone"
+                    onChangeText={(i) => handleChange("phone_number", i)}
                 />
 
                 <TextInput

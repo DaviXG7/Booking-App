@@ -5,7 +5,7 @@ import {makeRequest} from "@/hooks/useRequest";
 
 export async function getUsers(): Promise<Array<User | Professional>> {
     return await makeRequest({
-        url: "http://127.0.0.1:8000/users",
+        url: "http://127.0.0.1:8000/user/list",
         method: "GET",
         params: []
     }).then(function (resp) {

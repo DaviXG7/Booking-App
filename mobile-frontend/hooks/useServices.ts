@@ -1,9 +1,18 @@
 import {Service} from "@/types/Service";
-import {Professional} from "@/types/Professional";
+import {makeRequest} from "@/hooks/useRequest";
 
-export function getServices(): Array<Service> {
-    return [
-        { id: 1, name: "Corte de cabelo"},
-        { id: 2, name: "Legau"},
-    ]
+export async function getServices(): Promise<Array<Service>> {
+    return await makeRequest({
+        url: "http://127.0.0.1:8000/services/list",
+        method: "GET",
+        params: []
+    }).then(function (resp) {
+        return resp.json().then(function (data) {
+            console.log(data)
+            return data as Array<Service>;
+        }).catch((e) => {
+            console.log(e)
+            return [];
+        });
+    })
 }

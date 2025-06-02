@@ -46,12 +46,14 @@ export default function DefaultTabs() {
 
         )
         list.push(
+            getItem(selected, "/lists/Services", "Serviços", () => setSelected("Serviços"))
+        )
+        list.push(
             getItem(selected, "/lists/Bookings", "Reservas", () => setSelected("Reservas"))
 
         )
         list.push(
             getItem(selected, "/lists/Agendas", "Agendas", () => setSelected("Agendas"))
-
         )
     }
 
@@ -71,9 +73,10 @@ export default function DefaultTabs() {
 const styles = StyleSheet.create({
     tabs: {
         width: "100%",
-        height: 50,
+        height: 70,
         display: "flex",
         flexDirection: "row",
+        flexWrap: "wrap",
         justifyContent: "space-around",
         alignItems: "center",
         borderStyle: "solid",

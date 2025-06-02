@@ -1,6 +1,6 @@
 import {ThemedView} from "@/components/ThemedView";
 import {ThemedText} from "@/components/ThemedText";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Dropdown} from "react-native-element-dropdown";
 import {Pressable, StyleSheet, TextInput} from "react-native";
 import {getCustomers, getProfessionals} from "@/hooks/useUsers";
@@ -9,23 +9,42 @@ import {makeRequest} from "@/hooks/useRequest";
 import NotificationBox, {NotificationMessage} from "@/app/defaults/NotificationBox";
 import {getServices} from "@/hooks/useServices";
 import {getWeekDayValues} from "@/types/Days";
+import {User} from "@/types/User";
+import {Professional} from "@/types/Professional";
+import {Service} from "@/types/Service";
 
 export default function() {
 
-    const professionals = getProfessionals();
-    const services = getServices();
+    const [professionals, setUsers] = useState<Array<Professional>>([]);
+
+    useEffect(() => {
+        getProfessionals().then((users) => {
+            return setUsers(users);
+        })
+    }, []);
+
+    const [services, setServices] = useState<Array<Service>>([]);
+
+    useEffect(() => {
+        getServices().then((services) => {
+            return setServices(services);
+        })
+    }, []);
+
     const days = getWeekDayValues();
+
 
     const [message, setMessage] = useState<NotificationMessage | null>(null)
 
     const [formData, setFormData] = useState<RequestForm>({
-        url: "",
+        url: "http://127.0.0.1:8000/agenda/create/",
         method: "POST",
         params: [
             {key: "id_professional", value: null, isRequired: true},
             {key: "id_service", value: null, isRequired: true},
             {key: "week_day", value: null, isRequired: true},
             {key: "start_time", value: null, isRequired: true},
+            {key: "final_time", value: null, isRequired: true}
         ]
     });
 
@@ -105,9 +124,15 @@ export default function() {
 
                 <TextInput
                     style={styles.input}
-                    placeholder="Hora"
+                    placeholder="Hora inicial*"
                     keyboardType="numeric"
                     onChangeText={(i) => handleChange("start_time", i)}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Hora final*"
+                    keyboardType="numeric"
+                    onChangeText={(i) => handleChange("final_time", i)}
                 />
 
                 <Pressable style={styles.button} onPress={handleSubmit}>

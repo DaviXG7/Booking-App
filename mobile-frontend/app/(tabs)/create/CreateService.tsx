@@ -13,7 +13,7 @@ export default function() {
     const [message, setMessage] = useState<NotificationMessage | null>(null)
 
     const [formData, setFormData] = useState<RequestForm>({
-        url: "",
+        url: "http://127.0.0.1:8000/services/register",
         method: "POST",
         params: [
             {key: "name", value: null, isRequired: true},
@@ -32,7 +32,7 @@ export default function() {
 
     const handleSubmit = () => {
         console.log(formData);
-        makeRequest(formData).then(r => {
+        makeRequest(formData).then(async r => {
             if (r.status === 200) {
                 setMessage({
                     message: "Serviço registrado com sucesso!",
@@ -40,8 +40,11 @@ export default function() {
                 });
                 return
             }
+
+            const data = await r.json();
+
             setMessage({
-                message: "Erro ao registrar serviço",
+                message: "Erro ao registrar serviço " + data.message,
                 type: "error"
             });
 

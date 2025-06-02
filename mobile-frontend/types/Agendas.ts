@@ -7,4 +7,5 @@ export type Agenda = {
     service: Service,
     week_day: number,
     start_time: string,
+    final_time: string,
 }
