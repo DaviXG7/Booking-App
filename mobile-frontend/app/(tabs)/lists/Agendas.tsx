@@ -3,8 +3,10 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import {FlatList, Image, Pressable, StyleSheet, TextInput, View} from "react-native";
 import {ThemedView} from "@/components/ThemedView";
 import {useEffect, useState} from "react";
-import getAgendas from "@/hooks/useAgendas";
 import {Agenda} from "@/types/Agendas";
+import {getAgendas} from "@/hooks/useAgendas";
+import {makeRequest} from "@/hooks/useRequest";
+import getAgendamentos from "@/hooks/useAgendamentos";
 
 
 enum DayOfWeek {
@@ -45,16 +47,24 @@ function getDayOfWeek(index: number): string {
     return daysOfWeek[index];
 }
 
-function handleSearch(datetime: string){
+function handleSearch(agendas: Array<Agenda>, professional: string){
 
-    const agendas = getAgendas();
-
-    if (datetime == "") {
+    if (professional == "") {
         return agendas
     }
 
-    return agendas.filter(agenda => {
-        return agenda.week_day === getIndexOfDayOfWeek(datetime.toLowerCase());
+    return agendas.filter(agendas => {
+        return agendas.professional_name.toLowerCase().includes(professional.toLowerCase());
+    })
+}
+
+async function deleteAgenda(id: string): Promise<any> {
+    return await makeRequest({
+        url: "http://localhost:8000/agenda/delete",
+        method: "POST",
+        params: [
+            {key: "id_agenda", value: id, isRequired: true}
+        ]
     })
 }
 
@@ -62,11 +72,19 @@ export default function Agendas() {
 
     const [search, setSearch] = useState("");
 
+    const [dbAgendas, setDBAgendas] = useState<Array<Agenda>>([]);
+
+    useEffect(() => {
+        getAgendas().then((agendas) => {
+            return setDBAgendas(agendas);
+        })
+    }, []);
+
     const [agendas, setAgendas] = useState<Array<Agenda>>();
 
     useEffect(() => {
-        setAgendas(handleSearch(""))
-    }, [])
+        setAgendas(handleSearch(dbAgendas, search))
+    }, [dbAgendas, search])
 
     return <ParallaxScrollView
         headerImage={<></>} headerBackgroundColor={{
@@ -84,11 +102,11 @@ export default function Agendas() {
             >
                 <TextInput
                     style={styles.input}
-                    placeholder="Buscar por dia..."
+                    placeholder="Buscar por profissional..."
                     value={search}
                     onChangeText={(text => {
                         setSearch(text)
-                        setAgendas(handleSearch(search))
+                        setAgendas(handleSearch(dbAgendas, search))
                     })}
                     placeholderTextColor={"#999"}
                 />
@@ -102,21 +120,27 @@ export default function Agendas() {
                                 darkColor={"#222"}
                     >
                         <Image
-                            source={item?.professional.image ? { uri: item.professional.image } : require('@/assets/images/medico.jpg')}
+                            source={item?.professional_photo ? { uri: item.professional_photo } : require('@/assets/images/medico.jpg')}
                             style={styles.image}
                         />
                         <ThemedText numberOfLines={2} ellipsizeMode="tail">Dia da semana: {getDayOfWeek(item.week_day)}</ThemedText>
-                        <ThemedText numberOfLines={2} ellipsizeMode="tail">Profissional: {item.professional.name}</ThemedText>
-                        <ThemedText numberOfLines={3} ellipsizeMode="tail">Serviço: {item.service.name}</ThemedText>
+                        <ThemedText numberOfLines={2} ellipsizeMode="tail">Profissional: {item.professional_name}</ThemedText>
+                        <ThemedText numberOfLines={3} ellipsizeMode="tail">Serviço: {item.service_name}</ThemedText>
+                        <ThemedText numberOfLines={3} ellipsizeMode="tail">Horario de inicio: {item.start_time}</ThemedText>
+                        <ThemedText numberOfLines={3} ellipsizeMode="tail">Horario de fim: {item.final_time}</ThemedText>
 
                         <View style={{flexDirection: "row", gap: 10, justifyContent: "space-between", width: "100%"}}>
-                            <Pressable style={[styles.button, {backgroundColor: "green"}]}><ThemedText>Editar</ThemedText></Pressable>
-                            <Pressable style={[styles.button, {backgroundColor: "red"}]}><ThemedText>Excluir</ThemedText></Pressable>
+                            <Pressable
+                                onPress={() => deleteAgenda(item.id.toString()).then(() => {
+                                    getAgendas().then((agendas) => {
+                                        return setDBAgendas(agendas);
+                                    })
+                                })}
+                                style={[styles.button, { backgroundColor: "red" }]}
+                            ><ThemedText>Excluir</ThemedText></Pressable>
                         </View>
                     </ThemedView>
                 )}
-                numColumns={2}
-                columnWrapperStyle={styles.row}
             />
 
 

@@ -7,14 +7,27 @@ import CreateThings from "@/app/defaults/CreateThings";
 import {User} from "@/types/User";
 import {useCurrentUser} from "@/hooks/useUser";
 import getAgendamentos, {getAgendamentosByUser} from "@/hooks/useAgendamentos";
-
-const user: User | undefined = useCurrentUser()
+import {useEffect, useState} from "react";
+import {Booking} from "@/types/Bookings";
 
 export default function HomeScreen() {
 
-    const agendamentos = getAgendamentosByUser(user)
 
-  return (
+    const [bookings, setBookings] = useState<Array<Booking>>([])
+
+    const [user, setUser] = useState<User>();
+
+
+    useEffect(() => {
+        setUser(useCurrentUser());
+    }, []);
+
+    useEffect(() => {
+        getAgendamentosByUser(user).then(setBookings);
+    }, [user]);
+
+
+    return (
     <ParallaxScrollView
         headerImage={<></>}
         headerBackgroundColor={{
@@ -33,31 +46,33 @@ export default function HomeScreen() {
 
         <ThemedView style={{display: "flex", alignItems: "center"}}>
 
-            <ThemedText type="subtitle" style={{textAlign: "center"}}>Agendamentos: </ThemedText>
+            <ThemedText type="subtitle" style={{textAlign: "center"}}>Reservas: </ThemedText>
             <CreateThings></CreateThings>
+            <Pressable style={styles.recharge} onPress={() => {
+                console.log("zdadsadasdadad")
+                getAgendamentosByUser(user).then(setBookings)
+            }}><ThemedText>Recarregar...</ThemedText></Pressable>
 
-            {agendamentos.length == 0 && (
-                <ThemedText type={"defaultSemiBold"} style={{textAlign: "center"}}>Você não possui agendamentos</ThemedText>
+            {bookings.length == 0 && (
+                <ThemedText type={"defaultSemiBold"} style={{textAlign: "center"}}>Você não possui reservas agendadas</ThemedText>
             )}
             <FlatList
-                data={agendamentos}
+                data={bookings}
                 keyExtractor={(user) => user.id.toString()}
                 renderItem={({ item }) => (
                     <ThemedView style={styles.bookingContainer} lightColor={'#f7f7f7'} darkColor={'#222'}>
                         <ThemedView style={{alignItems: 'center', backgroundColor: "none"}}>
                             <Image
-                                source={item?.agenda.professional.image ? { uri: item.agenda.professional.image } : require('@/assets/images/medico.jpg')}
+                                source={item?.professional_profile ? { uri: item.professional_profile } : require('@/assets/images/medico.jpg')}
                                 style={styles.medicoLogo}
                             />
                         </ThemedView>
 
-                        <ThemedText>Data e hora: {item.date_time}</ThemedText>
-                        <ThemedText>Profissional: {item.agenda.professional.name}</ThemedText>
-                        <ThemedText>Serviço: {item.agenda.service.name}</ThemedText>
+                        <ThemedText>Data e hora: {item.date_time.replaceAll("-", "/")}</ThemedText>
+                        <ThemedText>Profissional: {item.professional_name}</ThemedText>
+                        <ThemedText>Serviço: {item.service_name}</ThemedText>
                     </ThemedView>
                 )}
-                numColumns={2}
-                columnWrapperStyle={styles.row}
             />
 
         </ThemedView>
@@ -77,6 +92,18 @@ const styles = StyleSheet.create({
     row: {
         justifyContent: 'space-between',
         paddingHorizontal: 8,
+    },
+    recharge: {
+      height: 50,
+        width: '50%',
+        backgroundColor: 'grey',
+        borderStyle: 'solid',
+        borderColor: '#d2d2d2',
+        borderRadius: 5,
+        borderWidth: 3,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
     },
   stepContainer: {
     gap: 8,

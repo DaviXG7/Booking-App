@@ -10,7 +10,7 @@ export default function CreateThings() {
     const user = useCurrentUser();
 
     const options = [
-        { label: "Criar agendamento", value: "1" },
+        { label: "Reservar atendimento", value: "1" },
     ];
 
     if (user?.role == "ADMIN") {

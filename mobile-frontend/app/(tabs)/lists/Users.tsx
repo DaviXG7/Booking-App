@@ -6,6 +6,8 @@ import {ThemedView} from "@/components/ThemedView";
 import {useEffect, useState} from "react";
 import {User} from "@/types/User";
 import {Professional} from "@/types/Professional";
+import {makeRequest} from "@/hooks/useRequest";
+import {useCurrentUser} from "@/hooks/useUser";
 
 
 function handleSearch(users: Array<User | Professional>, name: string){
@@ -17,6 +19,20 @@ function handleSearch(users: Array<User | Professional>, name: string){
 
     return users.filter(user => {
         return user.name.toLowerCase().includes(name.toLowerCase());
+    })
+}
+
+async function deleteUser(id: string): Promise<any> {
+    if (useCurrentUser()?.id.toString() === id) {
+        console.log("Você nao pode se deletar espertinho :D")
+        return [];
+    }
+    return await makeRequest({
+        url: "http://localhost:8000/user/delete",
+        method: "POST",
+        params: [
+            {key: "id_user", value: id, isRequired: true}
+        ]
     })
 }
 
@@ -83,10 +99,15 @@ export default function Users() {
                         <ThemedText>Cargo: {item.role}</ThemedText>
 
                         <View style={styles.buttons}>
-                            <Pressable style={[styles.button, { backgroundColor: "green" }]}>
-                                <ThemedText>Editar</ThemedText>
-                            </Pressable>
-                            <Pressable style={[styles.button, { backgroundColor: "red" }]}>
+                            <Pressable
+                                onPress={() => deleteUser(item.id.toString()).then(() => {
+                                    getUsers().then((users) => {
+                                        console.log(users)
+                                        return setDBUsers(users);
+                                    })
+                                })}
+                                style={[styles.button, { backgroundColor: "red" }]}
+                            >
                                 <ThemedText>Excluir</ThemedText>
                             </Pressable>
                         </View>

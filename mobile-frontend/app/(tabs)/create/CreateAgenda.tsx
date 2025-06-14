@@ -3,15 +3,37 @@ import {ThemedText} from "@/components/ThemedText";
 import React, {useEffect, useState} from "react";
 import {Dropdown} from "react-native-element-dropdown";
 import {Pressable, StyleSheet, TextInput} from "react-native";
-import {getCustomers, getProfessionals} from "@/hooks/useUsers";
+import {getProfessionals} from "@/hooks/useUsers";
 import {RequestForm} from "@/types/Form";
 import {makeRequest} from "@/hooks/useRequest";
 import NotificationBox, {NotificationMessage} from "@/app/defaults/NotificationBox";
 import {getServices} from "@/hooks/useServices";
 import {getWeekDayValues} from "@/types/Days";
-import {User} from "@/types/User";
 import {Professional} from "@/types/Professional";
 import {Service} from "@/types/Service";
+
+function checkHour(start: string | null | undefined, end: string | null | undefined) {
+    if (!start || !end) return false;
+
+    const [startH, startM] = start.split(":").map(Number);
+    const [endH, endM] = end.split(":").map(Number);
+
+    const allowedMinutes = [0, 15, 30, 45];
+    if (!allowedMinutes.includes(startM) || !allowedMinutes.includes(endM)) {
+        return false;
+    }
+
+    const startTotal = startH * 60 + startM;
+    const endTotal = endH * 60 + endM;
+
+    const diff = endTotal - startTotal;
+    if (diff <= 0) return false;
+
+    // Verifica se as minutagens são iguais ou com 30 minutos de diferença (cíclico)
+    const minuteDiff = (endM - startM + 60) % 60;
+    return minuteDiff === 0 || minuteDiff === 30;
+}
+
 
 export default function() {
 
@@ -59,16 +81,30 @@ export default function() {
 
     const handleSubmit = () => {
         console.log(formData);
-        makeRequest(formData).then(r => {
+
+        if (!checkHour(formData.params[3].value, formData.params[4].value)) {
+
+            setMessage({
+                message: "Formato de hora errado! Deve ser de 30 em 30 minutos a partir de 00:00 ou 00:15",
+                type: "warning"
+            });
+
+            return;
+        }
+
+        makeRequest(formData).then(async r => {
             if (r.status === 200) {
                 setMessage({
-                    message: "Profissional registrado com sucesso!",
+                    message: "Agenda criada com sucesso!",
                     type: "success"
                 });
                 return
             }
+
+            const data = await r.json();
+
             setMessage({
-                message: "Erro ao registrar profissional",
+                message: "Erro ao criar agenda: " + data.error ,
                 type: "error"
             });
 
@@ -92,10 +128,10 @@ export default function() {
                     maxHeight={300}
                     placeholderStyle={{padding: 20}}
                     labelField="name"
-                    valueField="id"
+                    valueField="id_professional"
                     placeholder={"Selecione o prof.. *"}
                     value={formData.params.find(p => p.key === "id_professional")?.value}
-                    onChange={item => handleChange("id_professional", item.id)}
+                    onChange={item => handleChange("id_professional", item.id_professional)}
                 />
 
                 <Dropdown

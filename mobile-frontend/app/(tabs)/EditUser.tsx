@@ -26,9 +26,10 @@ export default function TabTwoScreen() {
             setUser(currentUser);
             setProfessional(currentUser?.role === "PROFESSIONAL" ? currentUser as Professional : undefined)
             setFormData({
-                url: "http://127.0.0.1:8000/user/edit/" + currentUser?.id,
+                url: "http://127.0.0.1:8000/user/edit",
                 method: "POST",
                 params: [
+                    {key: "id_user", value: currentUser?.id.toString(), isRequired: true},
                     {key: "name", value: null, isRequired: false},
                     {key: "image", value: null, isRequired: false}
                 ]

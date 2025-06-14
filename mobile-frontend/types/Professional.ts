@@ -9,6 +9,7 @@ export type Professional = User &  {
     bank_name: string,
     account_number: string,
     agency: string,
+    id_professional: string
 
 
 }

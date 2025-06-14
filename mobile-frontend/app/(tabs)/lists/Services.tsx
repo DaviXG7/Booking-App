@@ -8,6 +8,8 @@ import {getServices} from "@/hooks/useServices";
 import {Service} from "@/types/Service";
 import {getUsers} from "@/hooks/useUsers";
 import {User} from "@/types/User";
+import {useCurrentUser} from "@/hooks/useUser";
+import {makeRequest} from "@/hooks/useRequest";
 
 
 function handleSearch(services: Array<Service> | undefined, name: string){
@@ -18,6 +20,16 @@ function handleSearch(services: Array<Service> | undefined, name: string){
 
     return services?.filter(service => {
         return service.name.toLowerCase().includes(name.toLowerCase());
+    })
+}
+
+async function deleteService(id: string): Promise<any> {
+    return await makeRequest({
+        url: "http://localhost:8000/services/delete",
+        method: "POST",
+        params: [
+            {key: "id_service", value: id, isRequired: true}
+        ]
     })
 }
 
@@ -81,8 +93,14 @@ export default function Services() {
                         <ThemedText numberOfLines={2} ellipsizeMode="tail">Valor: R${item.value}</ThemedText>
 
                         <View style={{flexDirection: "row", gap: 10, justifyContent: "space-between", width: "100%"}}>
-                            <Pressable style={[styles.button, {backgroundColor: "green"}]}><ThemedText>Editar</ThemedText></Pressable>
-                            <Pressable style={[styles.button, {backgroundColor: "red"}]}><ThemedText>Excluir</ThemedText></Pressable>
+                            <Pressable
+                                onPress={() => deleteService(item.id.toString()).then(() => {
+                                    getServices().then((services) => {
+                                        return setDBServices(services);
+                                    })
+                                })}
+                                style={[styles.button, { backgroundColor: "red" }]}
+                            ><ThemedText>Excluir</ThemedText></Pressable>
                         </View>
                     </ThemedView>
                 )}

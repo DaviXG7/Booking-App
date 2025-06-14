@@ -1,24 +1,43 @@
 import {Booking} from "@/types/Bookings";
 import {User} from "@/types/User";
+import {makeRequest} from "@/hooks/useRequest";
+import {Agenda} from "@/types/Agendas";
 
-export default function getAgendamentos(): Array<Booking> {
-    return [
-        {
-            id: 1,
-            customer: {id: 1, image: "", name: "Davi", email: "example", role: "CUSTOMER"},
-            date_time: "2023-10-01T10:00:00Z",
-            agenda: {
-                id: 1,
-                professional: {id: 10, image: "", name: "AFF2", email: "example@example.example", role: "PROFESSIONAL", phone_number: 0, pix: "0", professional_role: "", account_number: "1", agency: "a", bank_name: "b"},
-                service: { id: 1, name: "Corte de cabelo"},
-                week_day: 1,
-                start_time: "10:00",
-            }
-        }
-    ]
+export default async function getAgendamentos(): Promise<Array<Booking>> {
+    return await makeRequest({
+        url: "http://127.0.0.1:8000/booking/list",
+        method: "GET",
+        params: []
+    }).then(function (resp) {
+        return resp.json().then(function (data) {
+            console.log(data)
+            return data as Array<Booking>;
+        }).catch((e) => {
+            console.log(e)
+            return [];
+        });
+    })
 }
 
-export function getAgendamentosByUser(user: User | undefined): Array<Booking> {
+export async function getAgendamentosByUser(user: User | undefined): Promise<Array<Booking>> {
     if (!user) return []
-    return []
+    return await makeRequest({
+        url: "http://127.0.0.1:8000/booking/list/user",
+        method: "GET",
+        params: [
+            {
+                key: "id_user",
+                value: user.id + "",
+                isRequired: true
+            }
+        ]
+    }).then(function (resp) {
+        return resp.json().then(function (data) {
+            console.log(data)
+            return data as Array<Booking>;
+        }).catch((e) => {
+            console.log(e)
+            return [];
+        });
+    })
 }
